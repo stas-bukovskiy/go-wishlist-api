@@ -8,14 +8,14 @@ import (
 
 type Handler struct {
 	services *service.Service
-	logger   *logger.Logger
+	logger   logger.Logger
 }
 
-func NewHandler(services *service.Service, logger *logger.Logger) *Handler {
+func NewHandler(services *service.Service, logger logger.Logger) *Handler {
 	return &Handler{services: services, logger: logger}
 }
 
-func (h *Handler) InitRoutes() {
+func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.Default()
 
 	auth := router.Group("/auth")
@@ -23,4 +23,6 @@ func (h *Handler) InitRoutes() {
 		auth.POST("/sign-up")
 		auth.POST("/sign-in")
 	}
+
+	return router
 }
