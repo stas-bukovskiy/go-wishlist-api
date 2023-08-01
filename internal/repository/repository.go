@@ -9,11 +9,13 @@ import (
 
 type Repository struct {
 	User
+	Wishlist
 }
 
 func NewRepository(db *gorm.DB, logger logger.Logger) *Repository {
 	return &Repository{
-		User: NewUserRepo(db, logger),
+		User:     NewUserRepo(db, logger),
+		Wishlist: NewWishlistRepo(db, logger),
 	}
 }
 
@@ -21,4 +23,12 @@ type User interface {
 	SaveUser(user entity.User) (entity.User, error)
 	GetUserByEmailAndPassword(email string, password string) (entity.User, error)
 	GetUserById(id uuid.UUID) (entity.User, error)
+}
+
+type Wishlist interface {
+	GetAllByUserID(id uuid.UUID) ([]entity.Wishlist, error)
+	GetByID(id uuid.UUID) (entity.Wishlist, error)
+	CreateWishlist(wishlist entity.Wishlist) (entity.Wishlist, error)
+	UpdateWishlist(id uuid.UUID, wishlist entity.Wishlist) (entity.Wishlist, error)
+	DeleteWishlist(id uuid.UUID) (entity.Wishlist, error)
 }

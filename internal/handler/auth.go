@@ -32,7 +32,7 @@ func (h *Handler) signIn(ctx *gin.Context) {
 		return
 	}
 
-	token, err := h.services.Authorization.Authorize(input.Email, input.Password)
+	token, err := h.services.Authorization.Authenticate(input.Email, input.Password)
 	if err != nil {
 		httperrs.NewHTTPErrorResponse(ctx, log, err)
 		return

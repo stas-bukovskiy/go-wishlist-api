@@ -43,7 +43,7 @@ func main() {
 	}
 
 	// database schemas migration
-	err = db.DB.AutoMigrate(entity.User{})
+	err = db.DB.AutoMigrate(entity.User{}, entity.Wishlist{})
 	if err != nil {
 		log.With("error", err).Fatal("error occurred during database schemas migration")
 	}

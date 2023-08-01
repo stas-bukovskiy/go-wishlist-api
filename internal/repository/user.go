@@ -20,26 +20,19 @@ func NewUserRepo(db *gorm.DB, logger logger.Logger) *UserRepo {
 
 func (us *UserRepo) SaveUser(user entity.User) (entity.User, error) {
 	log := us.logger.Named("Create").With("user", user)
-	tx := us.db.Begin()
-	var exists bool
-	err := tx.Model(&entity.User{}).Select("count(*) > 0").
-		Where("email = ?", user.Email).
-		Find(&exists).
-		Error
-	if err != nil {
-		tx.Rollback()
-		return entity.User{}, err
-	}
-	if exists {
-		tx.Rollback()
-		return entity.User{}, errs.NewError(errs.AlreadyExist, "user with such mail already exists")
-	}
-
-	result := tx.Create(&user)
-
-	tx.Commit()
+	err := us.db.Transaction(func(tx *gorm.DB) error {
+		var exists bool
+		err := tx.Model(&entity.User{}).Select("count(*) > 0").Where("email = ?", user.Email).Find(&exists).Error
+		if err != nil {
+			return err
+		}
+		if exists {
+			return errs.NewError(errs.AlreadyExist, "user with such mail already exists")
+		}
+		return tx.Create(&user).Error
+	})
 	log.Debug("successfully created user")
-	return user, result.Error
+	return user, err
 }
 
 func (us *UserRepo) GetUserByEmailAndPassword(email, password string) (entity.User, error) {

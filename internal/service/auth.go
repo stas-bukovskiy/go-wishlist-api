@@ -41,7 +41,7 @@ type tokenClaims struct {
 	UserId uuid.UUID
 }
 
-func (s *AuthService) Authorize(email string, password string) (string, error) {
+func (s *AuthService) Authenticate(email string, password string) (string, error) {
 	user, err := s.repo.GetUserByEmailAndPassword(email, generatePasswordHash(password))
 	if err != nil {
 		if errs.KindIs(errs.NotFound, err) {

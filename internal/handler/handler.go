@@ -26,5 +26,17 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.POST("/sign-in", h.signIn)
 	}
 
+	api := router.Group("/api/v1", h.userIndemnityMiddleware)
+	{
+		wishlists := api.Group("/wishlists")
+		{
+			wishlists.GET("/", h.getAllWishlists)
+			wishlists.GET("/:id", h.getWishlistByID)
+			wishlists.POST("/", h.createWishlist)
+			wishlists.PUT("/:id", h.updateWishlist)
+			wishlists.DELETE("/:id", h.deleteWishlist)
+		}
+	}
+
 	return router
 }
