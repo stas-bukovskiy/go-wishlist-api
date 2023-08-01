@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"errors"
 )
 
 type Database interface {
@@ -11,7 +10,3 @@ type Database interface {
 	// Ping - checks if database is available.
 	Ping(ctx context.Context) error
 }
-
-var (
-	ErrDatabaseEmptyOutput = errors.New("empty query output")
-)

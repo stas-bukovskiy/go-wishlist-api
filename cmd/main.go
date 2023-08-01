@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
+	"github.com/stas-bukovskiy/go-n-react-wishlist-app/internal/entity"
 	"github.com/stas-bukovskiy/go-n-react-wishlist-app/internal/handler"
 	"github.com/stas-bukovskiy/go-n-react-wishlist-app/internal/repository"
 	"github.com/stas-bukovskiy/go-n-react-wishlist-app/internal/service"
@@ -42,7 +43,7 @@ func main() {
 	}
 
 	// database schemas migration
-	err = db.DB.AutoMigrate()
+	err = db.DB.AutoMigrate(entity.User{})
 	if err != nil {
 		log.With("error", err).Fatal("error occurred during database schemas migration")
 	}
