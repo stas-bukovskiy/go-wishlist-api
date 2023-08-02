@@ -11,6 +11,7 @@ type Service struct {
 	Authorization
 	User
 	Wishlist
+	WishlistItem
 }
 
 type Authorization interface {
@@ -30,9 +31,17 @@ type Wishlist interface {
 	DeleteWishlist(id uuid.UUID) (entity.Wishlist, error)
 }
 
+type WishlistItem interface {
+	GetByID(id uuid.UUID) (entity.WishlistItem, error)
+	AddItemToWishlist(item entity.WishlistItem) (entity.WishlistItem, error)
+	UpdateItem(id uuid.UUID, item entity.WishlistItem) (entity.WishlistItem, error)
+	DeleteItem(id uuid.UUID) (entity.WishlistItem, error)
+}
+
 func NewService(repos *repository.Repository, logger logger.Logger) *Service {
 	return &Service{
 		Authorization: NewAuthService(repos.User, logger),
 		Wishlist:      NewWishlistService(repos.Wishlist, logger),
+		WishlistItem:  NewWishlistItemService(repos.WishlistItem, logger),
 	}
 }

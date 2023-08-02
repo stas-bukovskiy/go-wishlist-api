@@ -29,7 +29,7 @@ func (wr *WishlistRepo) GetAllByUserID(userId uuid.UUID) ([]entity.Wishlist, err
 
 func (wr *WishlistRepo) GetByID(id uuid.UUID) (entity.Wishlist, error) {
 	var wishlist entity.Wishlist
-	err := wr.db.Where("id = ?", id).First(&wishlist).Error
+	err := wr.db.Preload("Items.Images").Where("id = ?", id).First(&wishlist).Error
 	if err != nil {
 		return entity.Wishlist{}, err
 	}
@@ -55,7 +55,7 @@ func (wr *WishlistRepo) UpdateWishlist(id uuid.UUID, wishlist entity.Wishlist) (
 			return errs.NewError(errs.NotFound, "such wishlist does not exist")
 		}
 		wishlist.ID = id
-		return wr.db.Clauses(clause.Returning{}).Model(&wishlist).Updates(map[string]interface{}{
+		return tx.Model(&wishlist).Clauses(clause.Returning{}).Preload("Items.Images").Updates(map[string]interface{}{
 			"title":       wishlist.Title,
 			"description": wishlist.Description,
 		}).Error
@@ -74,7 +74,7 @@ func (wr *WishlistRepo) DeleteWishlist(id uuid.UUID) (entity.Wishlist, error) {
 		if !exists {
 			return errs.NewError(errs.NotFound, "such wishlist does not exist")
 		}
-		return wr.db.Clauses(clause.Returning{}).Where("id = ?", id).Delete(&wishlist).Error
+		return tx.Clauses(clause.Returning{}).Preload("Items.Images").Where("id = ?", id).Delete(&wishlist).Error
 	})
 	return wishlist, err
 }

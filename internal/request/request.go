@@ -18,13 +18,15 @@ type AddWishlistItemRequest struct {
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
 	Price       uint      `json:"price"`
+	ImageURLs   []string  `json:"image_urls" binding:"max=5"`
 	URL         string    `json:"url" binding:"required,url"`
 }
 
 type UpdateWishlistItemRequest struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Price       uint   `json:"price"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Price       uint     `json:"price"`
+	ImageURLs   []string `json:"image_urls" binding:"max=5"`
 }
 
 type WishlistRequest struct {
