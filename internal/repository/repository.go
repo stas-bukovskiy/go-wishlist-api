@@ -30,6 +30,7 @@ type User interface {
 type Wishlist interface {
 	GetAllByUserID(id uuid.UUID) ([]entity.Wishlist, error)
 	GetByID(id uuid.UUID) (entity.Wishlist, error)
+	GetItemsByID(id uuid.UUID) ([]entity.WishlistItem, error)
 	CreateWishlist(wishlist entity.Wishlist) (entity.Wishlist, error)
 	UpdateWishlist(id uuid.UUID, wishlist entity.Wishlist) (entity.Wishlist, error)
 	DeleteWishlist(id uuid.UUID) (entity.Wishlist, error)

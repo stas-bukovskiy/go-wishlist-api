@@ -21,7 +21,7 @@ func NewWishlistItemRepo(db *gorm.DB, log logger.Logger) *WishlistItemRepo {
 
 func (w *WishlistItemRepo) GetByID(id uuid.UUID) (entity.WishlistItem, error) {
 	var item entity.WishlistItem
-	err := w.db.First(&item, id).Error
+	err := w.db.Preload("Images").First(&item, id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return entity.WishlistItem{}, errs.NewError(errs.NotFound, "wishlist item wish such id not found")
@@ -34,7 +34,7 @@ func (w *WishlistItemRepo) GetByID(id uuid.UUID) (entity.WishlistItem, error) {
 func (w *WishlistItemRepo) CreateWishlistItem(item entity.WishlistItem) (entity.WishlistItem, error) {
 	err := w.db.Transaction(func(tx *gorm.DB) error {
 		var exist bool
-		err := tx.Model(&entity.Wishlist{}).Select("count(*) > 0").Where("id = ?", item.WishlistId).Find(&exist).Error
+		err := tx.Model(&entity.Wishlist{}).Preload("Images").Select("count(*) > 0").Where("id = ?", item.WishlistId).Find(&exist).Error
 		if err != nil {
 			return err
 		}
@@ -42,7 +42,7 @@ func (w *WishlistItemRepo) CreateWishlistItem(item entity.WishlistItem) (entity.
 			return errs.NewError(errs.NotFound, "wishlist with such id not found")
 		}
 
-		return tx.Create(&item).Error
+		return tx.Preload("Images").Create(&item).Error
 	})
 	return item, err
 }
@@ -58,12 +58,16 @@ func (w *WishlistItemRepo) UpdateItem(id uuid.UUID, item entity.WishlistItem) (e
 			return errs.NewError(errs.NotFound, "wishlist item with such id not found")
 		}
 
-		return tx.Model(&item).Clauses(clause.Returning{}).Where("id = ?", id).Updates(map[string]interface{}{
+		err = tx.Model(&item).Where("id = ?", id).Updates(map[string]interface{}{
 			"title":       item.Title,
 			"description": item.Description,
 			"price":       item.Price,
 			//"image_urls":  item.ImageURLs,
 		}).Error
+		if err != nil {
+			return err
+		}
+		return tx.Preload("Images").Find(&item, id).Error
 	})
 	return item, err
 }
@@ -80,7 +84,11 @@ func (w *WishlistItemRepo) DeleteItem(id uuid.UUID) (entity.WishlistItem, error)
 			return errs.NewError(errs.NotFound, "wishlist item with such id not found")
 		}
 
-		return tx.Clauses(clause.Returning{}).Where("id = ?", id).Delete(&item).Error
+		err = tx.Clauses(clause.Returning{}).Preload("Images").Where("id = ?", id).Delete(&item).Error
+		if err != nil {
+			return err
+		}
+		return tx.Preload("Images").Find(&item, id).Error
 	})
 	return item, err
 }

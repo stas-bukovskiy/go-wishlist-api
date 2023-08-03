@@ -35,6 +35,21 @@ func (h *Handler) getWishlistByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, wishlist)
 }
 
+func (h *Handler) getWishlistItemsByID(ctx *gin.Context) {
+	wishlistID, err := uuid.FromString(ctx.Param("id"))
+	if err != nil {
+		httperrs.NewHTTPErrorResponse(ctx, h.logger, errs.NewError(errs.Validation, "wishlist id is not valid"))
+		return
+	}
+
+	wishlist, err := h.services.Wishlist.GetItemsByID(wishlistID)
+	if err != nil {
+		httperrs.NewHTTPErrorResponse(ctx, h.logger, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, wishlist)
+}
+
 func (h *Handler) createWishlist(ctx *gin.Context) {
 	user := MustCurrentUser(ctx)
 

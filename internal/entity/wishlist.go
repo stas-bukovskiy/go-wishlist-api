@@ -8,7 +8,7 @@ type Wishlist struct {
 	Description string         `gorm:"size:2000" json:"description"`
 	UserID      uuid.UUID      `gorm:"<-:create" json:"user_id"`
 	User        User           `json:"-"`
-	Items       []WishlistItem `json:"items,omitempty"`
+	Items       []WishlistItem `json:"-"`
 }
 
 type WishlistItem struct {

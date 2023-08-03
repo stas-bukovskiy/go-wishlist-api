@@ -32,6 +32,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			wishlists.GET("/", h.getAllWishlists)
 			wishlists.GET("/:id", h.getWishlistByID)
+			wishlists.GET("/:id/items", h.getWishlistItemsByID)
 			wishlists.POST("/", h.createWishlist)
 			wishlists.PUT("/:id", h.updateWishlist)
 			wishlists.DELETE("/:id", h.deleteWishlist)

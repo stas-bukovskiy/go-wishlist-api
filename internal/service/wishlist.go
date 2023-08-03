@@ -38,6 +38,17 @@ func (ws *WishlistService) GetByID(id uuid.UUID) (entity.Wishlist, error) {
 	return wishlist, nil
 }
 
+func (ws *WishlistService) GetItemsByID(id uuid.UUID) ([]entity.WishlistItem, error) {
+	wishlistItems, err := ws.repo.GetItemsByID(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errs.NewError(errs.NotFound, "wishlist not found")
+		}
+		return nil, err
+	}
+	return wishlistItems, nil
+}
+
 func (ws *WishlistService) CreateWishlist(userId uuid.UUID, title, description string) (entity.Wishlist, error) {
 	wishlist, err := ws.repo.CreateWishlist(entity.Wishlist{
 		Title:       title,
