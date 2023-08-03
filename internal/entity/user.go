@@ -2,7 +2,8 @@ package entity
 
 type User struct {
 	Base
-	Name     string `json:"name" binging:"required"`
-	Email    string `json:"email" binging:"required" gorm:"uniqueIndex"`
-	Password string `json:"-" gorm:"column:password_hash"`
+	Name      string     `json:"name" binging:"required"`
+	Email     string     `json:"email" binging:"required" gorm:"uniqueIndex"`
+	Password  string     `json:"-" gorm:"column:password_hash"`
+	Wishlists []Wishlist `json:"-" gorm:"constraint:OnDelete:CASCADE"`
 }
