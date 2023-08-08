@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stas-bukovskiy/go-n-react-wishlist-app/internal/entity"
 	"github.com/stas-bukovskiy/go-n-react-wishlist-app/pkg/errs"
@@ -31,6 +32,9 @@ func (wr *WishlistRepo) GetByID(id uuid.UUID) (entity.Wishlist, error) {
 	var wishlist entity.Wishlist
 	err := wr.db.Where("id = ?", id).First(&wishlist).Error
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return entity.Wishlist{}, errs.NewError(errs.NotFound, "wishlist with such id not found")
+		}
 		return entity.Wishlist{}, err
 	}
 	return wishlist, nil
