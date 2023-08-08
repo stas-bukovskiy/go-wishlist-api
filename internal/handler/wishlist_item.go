@@ -37,6 +37,7 @@ func (h *Handler) addItemToWishlist(ctx *gin.Context) {
 		Title:       itemToAdd.Title,
 		Description: itemToAdd.Description,
 		Price:       itemToAdd.Price,
+		Images:      fromIdToImages(itemToAdd.ImageIDs),
 		URL:         itemToAdd.URL,
 	})
 	if err != nil {
@@ -44,6 +45,18 @@ func (h *Handler) addItemToWishlist(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, item)
+}
+
+func fromIdToImages(imageIDs []uuid.UUID) []entity.Image {
+	var images []entity.Image
+	for _, imageId := range imageIDs {
+		images = append(images, entity.Image{
+			Base: entity.Base{
+				ID: imageId,
+			},
+		})
+	}
+	return images
 }
 
 func (h *Handler) updateItem(ctx *gin.Context) {
@@ -63,6 +76,7 @@ func (h *Handler) updateItem(ctx *gin.Context) {
 		Title:       itemToUpdate.Title,
 		Description: itemToUpdate.Description,
 		Price:       itemToUpdate.Price,
+		Images:      fromIdToImages(itemToUpdate.ImageIDs),
 	})
 
 	if err != nil {

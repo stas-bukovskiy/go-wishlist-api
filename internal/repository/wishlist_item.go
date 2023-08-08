@@ -34,7 +34,7 @@ func (w *WishlistItemRepo) GetByID(id uuid.UUID) (entity.WishlistItem, error) {
 func (w *WishlistItemRepo) CreateWishlistItem(item entity.WishlistItem) (entity.WishlistItem, error) {
 	err := w.db.Transaction(func(tx *gorm.DB) error {
 		var exist bool
-		err := tx.Model(&entity.Wishlist{}).Preload("Images").Select("count(*) > 0").Where("id = ?", item.WishlistId).Find(&exist).Error
+		err := tx.Model(&entity.Wishlist{}).Select("count(*) > 0").Where("id = ?", item.WishlistId).Find(&exist).Error
 		if err != nil {
 			return err
 		}
@@ -42,9 +42,36 @@ func (w *WishlistItemRepo) CreateWishlistItem(item entity.WishlistItem) (entity.
 			return errs.NewError(errs.NotFound, "wishlist with such id not found")
 		}
 
-		return tx.Preload("Images").Create(&item).Error
+		imageIDs := fromImagesToIds(item.Images)
+		err = tx.Model(&entity.Image{}).Select("count(*) = ?", len(item.Images)).Where("id IN (?)", imageIDs).Find(&exist).Error
+		if err != nil {
+			return err
+		}
+		if !exist {
+			return errs.NewError(errs.NotFound, "some image is not found")
+		}
+
+		err = tx.Omit("Images").Save(&item).Error
+		if err != nil {
+			return err
+		}
+
+		err = tx.Model(&entity.Image{}).Where("id IN (?)", imageIDs).Update("WishlistItemID", item.ID).Error
+		if err != nil {
+			return err
+		}
+
+		return tx.Preload("Images").First(&item, item.ID).Error
 	})
 	return item, err
+}
+
+func fromImagesToIds(images []entity.Image) []uuid.UUID {
+	var ids []uuid.UUID
+	for _, image := range images {
+		ids = append(ids, image.ID)
+	}
+	return ids
 }
 
 func (w *WishlistItemRepo) UpdateItem(id uuid.UUID, item entity.WishlistItem) (entity.WishlistItem, error) {
@@ -58,11 +85,30 @@ func (w *WishlistItemRepo) UpdateItem(id uuid.UUID, item entity.WishlistItem) (e
 			return errs.NewError(errs.NotFound, "wishlist item with such id not found")
 		}
 
-		err = tx.Model(&item).Where("id = ?", id).Updates(map[string]interface{}{
+		imageIDs := fromImagesToIds(item.Images)
+		err = tx.Model(&entity.Image{}).Select("count(*) = ?", len(item.Images)).Where("id IN (?)", imageIDs).Find(&exist).Error
+		if err != nil {
+			return err
+		}
+		if !exist {
+			return errs.NewError(errs.NotFound, "some image is not found")
+		}
+
+		err = tx.Model(&entity.Image{}).Where("wishlist_item_id = ?", id).Updates(map[string]interface{}{
+			"wishlist_item_id": nil,
+		}).Error
+		if err != nil {
+			return err
+		}
+		err = tx.Model(&entity.Image{}).Where("id IN (?)", imageIDs).Update("WishlistItemID", id).Error
+		if err != nil {
+			return err
+		}
+
+		err = tx.Omit("Images").Model(&item).Where("id = ?", id).Updates(map[string]interface{}{
 			"title":       item.Title,
 			"description": item.Description,
 			"price":       item.Price,
-			//"image_urls":  item.ImageURLs,
 		}).Error
 		if err != nil {
 			return err

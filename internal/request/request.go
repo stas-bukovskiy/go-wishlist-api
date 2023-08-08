@@ -14,19 +14,19 @@ type SignInRequest struct {
 }
 
 type AddWishlistItemRequest struct {
-	WishlistId  uuid.UUID `json:"wishlist_id" binding:"required"`
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	Price       uint      `json:"price"`
-	ImageURLs   []string  `json:"image_urls" binding:"max=5"`
-	URL         string    `json:"url" binding:"required,url"`
+	WishlistId  uuid.UUID   `json:"wishlist_id" binding:"required"`
+	Title       string      `json:"title"`
+	Description string      `json:"description"`
+	Price       uint        `json:"price"`
+	ImageIDs    []uuid.UUID `json:"image_ids" binding:"max=5"`
+	URL         string      `json:"url" binding:"required,url"`
 }
 
 type UpdateWishlistItemRequest struct {
-	Title       string   `json:"title"`
-	Description string   `json:"description"`
-	Price       uint     `json:"price"`
-	ImageURLs   []string `json:"image_urls" binding:"max=5"`
+	Title       string      `json:"title"`
+	Description string      `json:"description"`
+	Price       uint        `json:"price"`
+	ImageIDs    []uuid.UUID `json:"image_ids" binding:"max=5"`
 }
 
 type WishlistRequest struct {

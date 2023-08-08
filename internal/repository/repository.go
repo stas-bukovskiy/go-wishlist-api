@@ -11,6 +11,7 @@ type Repository struct {
 	User
 	Wishlist
 	WishlistItem
+	Image
 }
 
 func NewRepository(db *gorm.DB, logger logger.Logger) *Repository {
@@ -18,6 +19,7 @@ func NewRepository(db *gorm.DB, logger logger.Logger) *Repository {
 		User:         NewUserRepo(db, logger),
 		Wishlist:     NewWishlistRepo(db, logger),
 		WishlistItem: NewWishlistItemRepo(db, logger),
+		Image:        NewImageRepo(db, logger),
 	}
 }
 
@@ -41,4 +43,10 @@ type WishlistItem interface {
 	CreateWishlistItem(item entity.WishlistItem) (entity.WishlistItem, error)
 	UpdateItem(id uuid.UUID, item entity.WishlistItem) (entity.WishlistItem, error)
 	DeleteItem(id uuid.UUID) (entity.WishlistItem, error)
+}
+
+type Image interface {
+	GetImage(id uuid.UUID) (entity.Image, error)
+	SaveImage(image entity.Image) (entity.Image, error)
+	DeleteImage(id uuid.UUID) error
 }

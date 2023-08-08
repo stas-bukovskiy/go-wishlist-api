@@ -2,25 +2,25 @@ package service
 
 import (
 	uuid "github.com/satori/go.uuid"
+
 	"github.com/stas-bukovskiy/go-n-react-wishlist-app/internal/entity"
 	"github.com/stas-bukovskiy/go-n-react-wishlist-app/internal/repository"
+	"github.com/stas-bukovskiy/go-n-react-wishlist-app/internal/uploader"
 	"github.com/stas-bukovskiy/go-n-react-wishlist-app/pkg/logger"
+	"mime/multipart"
 )
 
 type Service struct {
 	Authorization
-	User
 	Wishlist
 	WishlistItem
+	Image
 }
 
 type Authorization interface {
 	CreateUser(name, email, password string) (entity.User, error)
 	Authenticate(email string, password string) (string, error)
 	ParseToken(token string) (entity.User, error)
-}
-
-type User interface {
 }
 
 type Wishlist interface {
@@ -39,10 +39,16 @@ type WishlistItem interface {
 	DeleteItem(id uuid.UUID) (entity.WishlistItem, error)
 }
 
-func NewService(repos *repository.Repository, logger logger.Logger) *Service {
+type Image interface {
+	CreateImage(file multipart.File, header *multipart.FileHeader) (entity.Image, error)
+	DeleteImage(id uuid.UUID) error
+}
+
+func NewService(repos *repository.Repository, imageUploader uploader.Image, logger logger.Logger) *Service {
 	return &Service{
 		Authorization: NewAuthService(repos.User, logger),
 		Wishlist:      NewWishlistService(repos.Wishlist, logger),
 		WishlistItem:  NewWishlistItemService(repos.WishlistItem, logger),
+		Image:         NewImageService(imageUploader, repos.Image, logger),
 	}
 }

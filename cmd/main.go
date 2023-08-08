@@ -1,12 +1,16 @@
 package main
 
 import (
+	"context"
 	"github.com/joho/godotenv"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/spf13/viper"
 	"github.com/stas-bukovskiy/go-n-react-wishlist-app/internal/entity"
 	"github.com/stas-bukovskiy/go-n-react-wishlist-app/internal/handler"
 	"github.com/stas-bukovskiy/go-n-react-wishlist-app/internal/repository"
 	"github.com/stas-bukovskiy/go-n-react-wishlist-app/internal/service"
+	"github.com/stas-bukovskiy/go-n-react-wishlist-app/internal/uploader"
 	"github.com/stas-bukovskiy/go-n-react-wishlist-app/pkg/database"
 	"github.com/stas-bukovskiy/go-n-react-wishlist-app/pkg/httpserver"
 	"github.com/stas-bukovskiy/go-n-react-wishlist-app/pkg/logger"
@@ -48,9 +52,33 @@ func main() {
 		log.With("error", err).Fatal("error occurred during database schemas migration")
 	}
 
+	// image upload client initialization
+	minioClient, err := minio.New(os.Getenv("MINIO_ENDPOINT"), &minio.Options{
+		Creds:  credentials.NewStaticV4(os.Getenv("MINIO_ACCESS_ID"), os.Getenv("MINIO_ACCESS_KEY"), ""),
+		Secure: false,
+	})
+	if err != nil {
+		log.With("error", err).Fatal("error occurred during minio client initialization")
+	}
+
+	exists, err := minioClient.BucketExists(context.Background(), "test")
+	if err != nil {
+		log.With("error", err).Fatal("error occurred during bucket existing check")
+	}
+	if !exists {
+		err := minioClient.MakeBucket(context.Background(), "test", minio.MakeBucketOptions{})
+		if err != nil {
+			log.With("error", err).Fatal("error occurred during bucket creation")
+		}
+	}
+	if err != nil {
+		log.With("error", err).Fatal("error occurred during image upload client initialization")
+	}
+
 	// layers initialization
 	repos := repository.NewRepository(db.DB, log)
-	services := service.NewService(repos, log)
+	imageUploader := uploader.NewImageUploader(minioClient, log)
+	services := service.NewService(repos, imageUploader, log)
 	handlers := handler.NewHandler(services, log)
 
 	// http server initialization

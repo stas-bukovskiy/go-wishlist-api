@@ -44,6 +44,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			wishlistItems.PUT("/:id", h.updateItem)
 			wishlistItems.DELETE("/:id", h.deleteItem)
 		}
+		images := api.Group("/images")
+		{
+			images.POST("/", h.uploadImage)
+			images.DELETE("/:id", h.deleteImage)
+		}
 	}
 
 	return router

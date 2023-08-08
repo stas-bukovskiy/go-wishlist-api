@@ -24,5 +24,6 @@ type WishlistItem struct {
 type Image struct {
 	Base
 	URL            string    `json:"url"`
+	ImageName      string    `json:"image_name"`
 	WishlistItemID uuid.UUID `json:"wishlist_item_id"`
 }
