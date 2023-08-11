@@ -10,6 +10,16 @@ import (
 	"net/http"
 )
 
+// @Summary      Get wishlist item
+// @Description  Get wishlist item by its id
+// @Security 	 ApiKeyAuth
+// @Tags         wishlist-items
+// @Accept       json
+// @Produce      json
+// @Param 		 id path string true "wishlist item id"
+// @success      200 {object} entity.WishlistItem "wishlist item"
+// @Failure      400,404,500  {object}  httperrs.ErrorResponse
+// @Router       /api/v1/wishlist-items/{id} [get]
 func (h *Handler) getWishlistItem(ctx *gin.Context) {
 	itemID, err := uuid.FromString(ctx.Param("id"))
 	if err != nil {
@@ -25,6 +35,16 @@ func (h *Handler) getWishlistItem(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, item)
 }
 
+// @Summary      Create a new wishlist item
+// @Description  Create a new wishlist item
+// @Security 	 ApiKeyAuth
+// @Tags         wishlist-items
+// @Accept       json
+// @Produce      json
+// @Param 		 request body request.AddWishlistItemRequest true "create wishlist item request"
+// @success      200 {object} entity.WishlistItem "wishlist item"
+// @Failure      400,404,500  {object}  httperrs.ErrorResponse
+// @Router       /api/v1/wishlist-items/ [post]
 func (h *Handler) addItemToWishlist(ctx *gin.Context) {
 	var itemToAdd request.AddWishlistItemRequest
 	if err := ctx.BindJSON(&itemToAdd); err != nil {
@@ -59,6 +79,17 @@ func fromIdToImages(imageIDs []uuid.UUID) []entity.Image {
 	return images
 }
 
+// @Summary      Update a wishlist item
+// @Description  Create existing wishlist item by its id
+// @Security 	 ApiKeyAuth
+// @Tags         wishlist-items
+// @Accept       json
+// @Produce      json
+// @Param 		 id path string true "wishlist item id"
+// @Param 		 request body request.UpdateWishlistItemRequest true "update wishlist item request"
+// @success      200 {object} entity.WishlistItem "wishlist item"
+// @Failure      400,404,500  {object}  httperrs.ErrorResponse
+// @Router       /api/v1/wishlist-items/{id} [put]
 func (h *Handler) updateItem(ctx *gin.Context) {
 	id, err := uuid.FromString(ctx.Param("id"))
 	if err != nil {
@@ -86,6 +117,16 @@ func (h *Handler) updateItem(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, item)
 }
 
+// @Summary      Delete wishlist item
+// @Description  Delete wishlist item by its id
+// @Security 	 ApiKeyAuth
+// @Tags         wishlist-items
+// @Accept       json
+// @Produce      json
+// @Param 		 id path string true "wishlist item id"
+// @success      200 {object} entity.WishlistItem "wishlist item"
+// @Failure      400,404,500  {object}  httperrs.ErrorResponse
+// @Router       /api/v1/wishlist-items/{id} [delete]
 func (h *Handler) deleteItem(ctx *gin.Context) {
 	id, err := uuid.FromString(ctx.Param("id"))
 	if err != nil {

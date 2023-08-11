@@ -2,8 +2,11 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	_ "github.com/stas-bukovskiy/go-n-react-wishlist-app/docs"
 	"github.com/stas-bukovskiy/go-n-react-wishlist-app/internal/service"
 	"github.com/stas-bukovskiy/go-n-react-wishlist-app/pkg/logger"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Handler struct {
@@ -20,6 +23,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	router.Use(h.requestIDMiddleware)
 
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	auth := router.Group("/auth")
 	{
 		auth.POST("/sign-up", h.signUp)

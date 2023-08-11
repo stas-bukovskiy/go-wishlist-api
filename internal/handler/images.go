@@ -9,6 +9,15 @@ import (
 	"net/http"
 )
 
+// @Summary      Upload Image
+// @Description  Upload image and get its id and url
+// @Security 	 ApiKeyAuth
+// @Tags         images
+// @Accept       mpfd
+// @Produce      json
+// @success      200 {object} entity.Image "uploaded image"
+// @Failure      400,500  {object}  httperrs.ErrorResponse
+// @Router       /api/v1/images/ [post]
 func (h *Handler) uploadImage(ctx *gin.Context) {
 	file, fileHeaders, err := ctx.Request.FormFile("image")
 	if err != nil {
@@ -29,6 +38,16 @@ func (h *Handler) uploadImage(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, image)
 }
 
+// @Summary      Delete Image
+// @Description  Delete an image by its id
+// @Security 	 ApiKeyAuth
+// @Tags         images
+// @Accept       json
+// @Produce      json
+// @Param 		 id path string true "image id"
+// @success      200 {string} string ""
+// @Failure      400,404,500  {object}  httperrs.ErrorResponse
+// @Router       /api/v1/images/{id} [delete]
 func (h *Handler) deleteImage(ctx *gin.Context) {
 	id, err := uuid.FromString(ctx.Param("id"))
 	if err != nil {

@@ -19,6 +19,19 @@ import (
 	"syscall"
 )
 
+// @title           Go Wishlist API
+// @version         1.0
+// @description     This is a simple API to create and manage wishlists with any sort of products or content
+
+// @contact.name   Stas Bukovskyi
+// @contact.email  stas.bukovskyi@gmail.com
+
+// @host      localhost:8000
+// @BasePath  /
+
+// @securityDefinitions.apikey  ApiKeyAuth
+// @in header
+// @name Authorization
 func main() {
 	log := logger.New("DEBUG")
 
@@ -103,6 +116,7 @@ func main() {
 	}
 }
 
+// initialize config files by using viper
 func initConfig() error {
 	viper.AddConfigPath("configs")
 	viper.SetConfigName("config")
