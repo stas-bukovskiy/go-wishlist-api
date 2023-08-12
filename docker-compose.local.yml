@@ -1,29 +1,14 @@
 version: '3.1'
 
 services:
-  wihslist-api:
-    container_name: wishlist-api
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-    networks:
-      - wishlist-network
-    depends_on:
-      - minio
-      - wishlist-db
-
   wishlist-db:
     container_name: wishlist-db
     image: postgres:15
     restart: always
     ports:
-      - "5432:5432"
+      - "5436:5432"
     environment:
       POSTGRES_PASSWORD: password
-    networks:
-      - wishlist-network
 
   minio:
     container_name: wishlist-minio
@@ -37,12 +22,6 @@ services:
       MINIO_ROOT_USER: root
       MINIO_ROOT_PASSWORD: password
     command: server --console-address ":9001" /data
-    networks:
-      - wishlist-network
 
 volumes:
   minio_storage: { }
-
-
-networks:
-  wishlist-network:
