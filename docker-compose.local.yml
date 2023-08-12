@@ -2,7 +2,7 @@ version: '3.1'
 
 services:
   wishlist-db:
-    container_name: wishlist-db
+    container_name: wishlist-db-local
     image: postgres:15
     restart: always
     ports:
@@ -11,7 +11,7 @@ services:
       POSTGRES_PASSWORD: password
 
   minio:
-    container_name: wishlist-minio
+    container_name: wishlist-minio-local
     image: minio/minio
     ports:
       - "9000:9000"
